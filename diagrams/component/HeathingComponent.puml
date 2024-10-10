@@ -1,0 +1,29 @@
+@startuml
+title Heathing Component Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Container_Boundary(HeathingSystem, "Heathing System") {
+  Container(HeathingApp, "Сервис управления отоплением", "Golang")
+  Container(Database, "Database", "PostgreSQL")
+}
+
+Container(HeathingApp, "Сервис управления отоплением", "Golang") {
+  Component(Controller, "Controller")
+  Component(ServiceLayer, "Service Layer")
+  Component(RepositoryLayer, "Repository Layer")
+  Component(EventLayer,"Event Layer")
+}
+
+ContainerQueue(kafka, "Шина данных", "Kafka")
+
+
+Rel(Controller,ServiceLayer,"Вызов бизнес логики")
+Rel(ServiceLayer,RepositoryLayer,"Чтение/Запись данных")
+Rel(ServiceLayer,EventLayer,"Чтение/Запись данных")
+Rel(RepositoryLayer,Database,"Чтение/запись данных")
+Rel(EventLayer, kafka,"")
+
+@enduml
