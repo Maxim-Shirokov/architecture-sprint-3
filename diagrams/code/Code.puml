@@ -1,0 +1,3 @@
+@startmul
+!include  https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Code.puml
+@endmul

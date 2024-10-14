@@ -1,0 +1,47 @@
+@startuml
+title SmartHome Container Diagram
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "Пользователь")
+System(SmartHome, "SmartHome System", "Система управления отоплением и мониторингом температуры")
+System(UserInteractions, "Взаимодействие с пользователем")
+
+Container_Boundary(UserInteractions, "Взаимодействие с пользователем") {
+  Container(WebApp, "Web Application", "React", "Обработчик пользовательских запросов")
+}
+
+Container_Boundary(SmartHome, "Система умный дом") {
+    Container(ApiGateway, "Api Gateway", "Kongo", "Обрабочтик API запросов, авторизация, аутентификация")
+    Container(HeathingSystem, "Сервис отопления", "Golang")
+    Container(TelemetrySystem, "Сервис мониторинга температуры", "Golang")
+    Container(UserSystem, "Сервис пользователей", "Golang")
+    ContainerDb(HeathingDb, "Postgres хранилище устройств отополения")
+    ContainerDb(TelemetrygDb, "Postgres хранилище телеметрии")
+    ContainerDb(UserDb, "Postgres хранилище пользователей")
+}
+
+Container_Boundary(Broker, "Message Broker") {
+    ContainerQueue(kafka, "Шина данных", "Kafka")
+}
+
+System_Ext(sensor, "Датчики", "")
+
+Rel(user, WebApp, "Пользователь использует систему")
+Rel(WebApp,ApiGateway,"Запрос данных")
+Rel(ApiGateway,HeathingSystem,"Управлять отоплением")
+Rel(ApiGateway,TelemetrySystem,"Получить информации о температуре")
+Rel(ApiGateway,UserSystem,"Получить информации о пользователе")
+
+Rel(HeathingSystem,HeathingDb,"Чтение/запись")
+Rel(TelemetrySystem,TelemetrygDb,"Чтение/запись")
+Rel(UserSystem,UserDb,"Чтение/запись")
+
+Rel(sensor, kafka, "Событие обновления температуры")
+Rel(kafka, TelemetrySystem, "Событие обновления температуры")
+Rel(kafka, sensor, "Событие обновления температуры")
+Rel(HeathingSystem, kafka, "Событие обновления температуры")
+
+@endumlы

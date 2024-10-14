@@ -1,0 +1,43 @@
+@startuml
+
+entity User {
+  id: uuid
+  --
+}
+
+entity House {
+  id: uuid
+  user_id: uuid
+  --
+}
+
+entity Device {
+  id: uuid
+  type_id: uuid
+  house_id: uuid
+  serial_number: text
+  status: text
+  updated_at: timestamp
+  --
+}
+
+entity DeviceType {
+  id: uuid
+  title: text
+  --
+}
+
+entity Telemetry {
+  id: uuid  
+  device_id: uuid
+  data: json
+  updated_at: timestamp
+  --
+}
+
+User ||---o{ House
+House ||---o{ Device
+Device ||---o{ DeviceType
+Device ||----o{ Telemetry
+
+@enduml

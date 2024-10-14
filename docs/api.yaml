@@ -1,0 +1,276 @@
+openapi: 3.0.3
+info:
+  title: SmartHome
+  version: 0.0.1
+paths:
+  /device-types:
+    post:
+      tags:
+        - Микросервис «Heathing»
+      summary: Создаёт тип устройства
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '500':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            
+  /devices:
+    post:
+      tags:
+        - Микросервис «Heathing»
+      summary: Создаёт устройство
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type_id:
+                  type: string
+                  format: uuid
+                serial_number:
+                  type: string
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+        '500':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /device/{device_id}:
+    get:
+      tags:
+        - Микросервис «Heathing»
+      summary: Возвращает подробную информацию о конкретном устройстве по его ID
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: успех
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  type_id::
+                    type: string
+                    format: uuid
+                  serial_number:
+                    type: string
+                  status:
+                    type: string
+        '404':
+          description: not found
+        '500':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /device/{device_id}/status:
+    put:
+      tags:
+        - Микросервис «Heathing»
+      summary: Обновляет статус устройства
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+      responses:
+        '200':
+          description: success
+        '404':
+          description: not found
+        '500':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /device/{device_id}/commands:
+    post:
+      tags:
+        - Микросервис «Heathing»
+      summary: Отправляет команду устройству
+      parameters:
+        - name: device_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                command:
+                  type: string
+      responses:
+        '200':
+          description: success
+        '404':
+          description: not found
+        '500':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /telemetry/latest:
+    get:
+      tags:
+        - Микросервис «Telemetry»
+      summary: Возвращает последнее полученное значение телеметрии для устройства
+      parameters:
+        - name: device_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  device_id:
+                    type: string
+                    format: uuid
+                  updated_at:
+                    type: string
+                  data:
+                    type: object
+        '404':
+          description: not found
+        '500':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /telemetry:
+    get:
+      tags:
+        - Микросервис «Telemetry»
+      summary: Возвращает последнее полученное значение телеметрии для устройства
+      parameters:
+        - name: device_id
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+        - name: until
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+
+      responses:
+        '200':
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                    device_id:
+                      type: string
+                      format: uuid
+                    updated_at:
+                      type: string
+                    data:
+                      type: object
+        '500':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+
+components:
+  schemas:
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
